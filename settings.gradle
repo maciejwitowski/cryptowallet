@@ -8,3 +8,4 @@ dependencyResolutionManagement {
 }
 rootProject.name = "cryptowallet"
 include ':app'
+include ':solanaclient'
