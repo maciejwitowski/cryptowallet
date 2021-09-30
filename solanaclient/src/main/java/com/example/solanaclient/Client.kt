@@ -1,13 +1,15 @@
 package com.example.solanaclient
 
-import com.example.solanaclient.api.GetBalanceRequest
-import com.example.solanaclient.api.GetBalanceResult
-import com.example.solanaclient.api.GetRecentBlockhashRequest
-import com.example.solanaclient.api.GetRecentBlockhashResult
+import com.example.solanaclient.api.*
 import com.example.solanaclient.utils.encodeToBase58String
 
 class Client(baseUrl: String) {
   private val api = SolanaApi(baseUrl)
+
+  suspend fun getAccountInfo(pubKey: ByteArray): GetAccountInfoResult =
+    api.solana.getAccountInfo(
+      GetAccountInfoRequest.build(1, pubKey.encodeToBase58String())
+    ).body()!!.result
 
   suspend fun getVersion(): GetVersionResponse =
     api.solana.getVersion(GetVersionRequest.build(1)).body()!!.result

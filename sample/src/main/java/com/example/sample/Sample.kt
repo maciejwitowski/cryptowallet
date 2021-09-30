@@ -2,12 +2,65 @@ package com.example.sample
 
 import com.example.solanaclient.Client
 import com.example.solanaclient.KeyPair
+import com.example.solanaclient.api.GetAccountInfoResult
 import kotlinx.coroutines.runBlocking
+
+val client = Client("http://127.0.0.1:8899")
 
 fun main() {
   println("Let's say hello to a Solana account...")
 
-  val baseUrl = "http://127.0.0.1:8899"
+  val keyPair = getPayer()
+  runBlocking {
+    println("Connection to cluster established: ${client.getVersion()}")
+
+    val blockhash = client.getRecentBlockhash()
+    println("Blockhash: $blockhash")
+
+    val balance = client.getBalance(keyPair.public)
+    println("Balance: $balance")
+
+    val programAccountInfo = checkProgram()
+    println("programAccountInfo: $programAccountInfo")
+
+    if (programAccountInfo.value == null) {
+      println("Program probably wasn't deployed. Returning...")
+    } else {
+
+    }
+  }
+}
+
+private fun getPayer(): KeyPair {
+  val publicKey = intArrayOf(
+    196, 1, 112, 204, 253, 0, 116, 162,
+    51, 177, 34, 97, 1, 204, 169, 65,
+    127, 72, 193, 58, 62, 217, 236, 46,
+    238, 138, 201, 219, 62, 168, 165, 21
+  ).map { it.toByte() }.toByteArray()
+
+  val secret = intArrayOf(
+    57, 54, 212, 125, 240, 170, 112, 192, 103, 193, 103,
+    146, 251, 103, 238, 87, 189, 182, 80, 118, 237, 66,
+    46, 76, 24, 125, 76, 134, 44, 167, 20, 123, 196,
+    1, 112, 204, 253, 0, 116, 162, 51, 177, 34, 97,
+    1, 204, 169, 65, 127, 72, 193, 58, 62, 217, 236,
+    46, 238, 138, 201, 219, 62, 168, 165, 21
+  ).map { it.toByte() }.toByteArray()
+
+
+  return KeyPair(
+    public = publicKey,
+    secret = secret
+  )
+}
+
+private suspend fun checkProgram(): GetAccountInfoResult {
+  val programKeypair = getProgramKeypair()
+  return client.getAccountInfo(programKeypair.public)
+}
+
+private fun getProgramKeypair(): KeyPair {
   val publicKey = intArrayOf(
     226, 176, 33, 0, 230, 122, 12, 16,
     99, 45, 7, 249, 84, 216, 211, 169,
@@ -25,19 +78,8 @@ fun main() {
   ).map { it.toByte() }.toByteArray()
 
 
-  val keyPair = KeyPair(
+  return KeyPair(
     public = publicKey,
     secret = secret
   )
-
-  val client = Client(baseUrl)
-  runBlocking {
-    println("Connection to cluster established: ${client.getVersion()}")
-
-    val blockhash = client.getRecentBlockhash()
-    println("Blockhash: $blockhash")
-
-    val balance = client.getBalance(keyPair.public)
-    println("Balance: $balance")
-  }
 }

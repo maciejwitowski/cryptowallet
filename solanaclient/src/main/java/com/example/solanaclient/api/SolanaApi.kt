@@ -1,9 +1,6 @@
 package com.example.solanaclient
 
-import com.example.solanaclient.api.GetBalanceRequest
-import com.example.solanaclient.api.GetBalanceResponseWrapper
-import com.example.solanaclient.api.GetRecentBlockhashRequest
-import com.example.solanaclient.api.GetRecentBlockhashResponseWrapper
+import com.example.solanaclient.api.*
 import okhttp3.OkHttpClient
 import okio.ByteString.Companion.decodeBase64
 import retrofit2.Retrofit
@@ -26,6 +23,9 @@ internal class SolanaApi(baseUrl: String) {
 }
 
 internal interface SolanaService {
+  @POST("/")
+  suspend fun getAccountInfo(@Body request: GetAccountInfoRequest): RetrofitResponse<GetAccountInfoResponseWrapper>
+
   @POST("/")
   suspend fun getVersion(@Body request: GetVersionRequest): RetrofitResponse<GetVersionResponseWrapper>
 
