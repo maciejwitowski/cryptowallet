@@ -1,8 +1,8 @@
-package com.example.solanaclient
+package com.example.solanaclient.api
 
-import com.example.solanaclient.api.*
+import com.example.solanaclient.GetVersionRequest
+import com.example.solanaclient.GetVersionResponseWrapper
 import okhttp3.OkHttpClient
-import okio.ByteString.Companion.decodeBase64
 import retrofit2.Retrofit
 import retrofit2.converter.moshi.MoshiConverterFactory
 import retrofit2.http.Body
@@ -34,5 +34,8 @@ internal interface SolanaService {
 
   @POST("/")
   suspend fun getBalance(@Body request: GetBalanceRequest): RetrofitResponse<GetBalanceResponseWrapper>
+
+  @POST("/")
+  suspend fun sendTransaction(@Body request: SendTransactionRequest): RetrofitResponse<SentTransactionResponse>
 }
 

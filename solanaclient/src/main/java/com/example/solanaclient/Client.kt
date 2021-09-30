@@ -19,5 +19,8 @@ class Client(baseUrl: String) {
 
   suspend fun getBalance(pubKey: ByteArray): GetBalanceResult =
     api.solana.getBalance(GetBalanceRequest.build(1, pubKey.encodeToBase58String())).body()!!.result
+
+  suspend fun sendTransaction(transaction: Transaction, signer: KeyPair): SentTransactionResponse =
+    api.solana.sendTransaction(SendTransactionRequest.build(1, "")).body()!! // TODO Encode transaction
 }
 

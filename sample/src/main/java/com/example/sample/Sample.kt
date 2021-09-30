@@ -1,8 +1,6 @@
 package com.example.sample
 
-import com.example.solanaclient.Client
-import com.example.solanaclient.KeyPair
-import com.example.solanaclient.api.GetAccountInfoResult
+import com.example.solanaclient.*
 import kotlinx.coroutines.runBlocking
 
 val client = Client("http://127.0.0.1:8899")
@@ -10,23 +8,38 @@ val client = Client("http://127.0.0.1:8899")
 fun main() {
   println("Let's say hello to a Solana account...")
 
-  val keyPair = getPayer()
+  val payer = getPayer()
   runBlocking {
     println("Connection to cluster established: ${client.getVersion()}")
 
     val blockhash = client.getRecentBlockhash()
     println("Blockhash: $blockhash")
 
-    val balance = client.getBalance(keyPair.public)
+    val balance = client.getBalance(payer.public)
     println("Balance: $balance")
 
-    val programAccountInfo = checkProgram()
+    val program = getProgramKeypair()
+    val programAccountInfo = client.getAccountInfo(program.public)
     println("programAccountInfo: $programAccountInfo")
 
     if (programAccountInfo.value == null) {
       println("Program probably wasn't deployed. Returning...")
     } else {
+      val instructions = listOf(
+        TransactionInstruction(
+          pubKeys = listOf(
+            AccountMeta(
+              publicKey = payer.public,
+              isSigner = false,
+              isWritable = true
+            )
+          ),
+          programId = program.public
+        )
+      )
 
+      val transactionResponse = client.sendTransaction(Transaction(instructions), payer)
+      println("Transaction response: $transactionResponse")
     }
   }
 }
@@ -53,11 +66,6 @@ private fun getPayer(): KeyPair {
     public = publicKey,
     secret = secret
   )
-}
-
-private suspend fun checkProgram(): GetAccountInfoResult {
-  val programKeypair = getProgramKeypair()
-  return client.getAccountInfo(programKeypair.public)
 }
 
 private fun getProgramKeypair(): KeyPair {
